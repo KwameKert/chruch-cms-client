@@ -13,11 +13,8 @@ export default {
 }
 </script>
 <style >
-    body{
-    overflow-x: hidden !important;
+   body{
+    overflow: hidden !important;
  
-}
-#auth{
-    height: 100%;
 }
 </style>

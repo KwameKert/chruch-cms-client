@@ -26,7 +26,7 @@
           <i class="fas fa-bible"></i>  Sermons
         </router-link>
 
-        <router-link  class="list-group-item list-group-item-action bg-light" to="/event">
+        <router-link  class="list-group-item list-group-item-action bg-light" to="/department">
           <i class="mdi mdi-office-building"></i>  Departments
         </router-link>
 

@@ -2,10 +2,31 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Auth  from '../layouts/Auth';
 import Dashboard from '../views/Dashboard';
+import Department from '../views/Department';
 import Default from '../layouts/Default';
 import Login from '../views/Login';
 
 Vue.use(VueRouter)
+
+function guardMyroute(to, from, next)
+{
+ var isAuthenticated= false;
+//this is just an example. You will have to find a better or 
+// centralised way to handle you localstorage data handling 
+if(localStorage.getItem('user') )
+  isAuthenticated = true;
+ else
+  isAuthenticated= false;
+ if(isAuthenticated) 
+ {
+  next(); // allow to enter route
+ } 
+ else
+ {
+  next('/login'); // go to '/login';
+ }
+}
+
 
 const routes = [
   {
@@ -20,8 +41,11 @@ const routes = [
     path: '',
     component: Default,
     children: [
-      {path: '/dashboard', component:Dashboard}
-    ]
+      {path: '/dashboard', component:Dashboard},
+      {path: '/department', component:Department}
+    ],
+    beforeEnter : guardMyroute
+    
   }
 
 ]
