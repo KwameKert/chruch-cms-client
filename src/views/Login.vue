@@ -62,8 +62,6 @@ import axios from "axios";
 export default {
   name: "Login",
   data() {
-    
-    console.log("im here");
     return {
       isLoading : false,
       form: {

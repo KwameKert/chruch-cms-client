@@ -6,7 +6,7 @@
         <div  id="page-content-wrapper" >
              <Header v-on:toggleMenu="handleToggle"/>
             <div id="page-content-wrapper">
-                <div class="container-fluid">
+                <div class="container-fluid ">
                   
                     <router-view></router-view>
                 </div>
