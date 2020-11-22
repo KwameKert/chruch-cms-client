@@ -20,9 +20,10 @@
             <div class="row  mt-3">
                 <div class="col-12 table-responsive">
 
-                    <b-table striped hover :fields="fields" :items="items">
-                          <template #cell(index)="data">
-                                {{ data.index + 1 }}
+                    <b-table striped hover :fields="fields" :items="items" :per-page="perPage"
+      :current-page="currentPage">
+                          <template #cell(content)="data">
+                                {{ data.item.content.slice(0, 100)  }}...
                             </template>
 
                           <template #cell(createdAt)="data">
@@ -30,6 +31,15 @@
                                 <!-- {{ data.index + 1 }} -->
                             </template>
                     </b-table>
+
+                      <b-pagination
+                      class="mt-3 float-right"
+                        v-model="currentPage"
+                        :total-rows="rows"
+                        :per-page="perPage"
+                        aria-controls="itemList"
+                        align="center"
+                        ></b-pagination>
                 </div>
             </div>
         </div>
@@ -45,16 +55,16 @@
                 ></b-img>
                </div>
                <div class="col-md-6">
-                    <form >
+                    <form @submit.prevent="submitForm()">
                 
                <div class="form-group">
                    <label for="">Name</label>
-                   <input type="text" class="form-control" placeholder="Enter name here">
+                   <input type="text" class="form-control" placeholder="Enter name here" v-model="form.name">
                </div>
 
                <div class="form-group">
                    <label for="">Status</label>
-                   <select name="" id="" class="form-control">
+                   <select name="" id="" class="form-control"  v-model="form.status">
                        <option value="active">
                            Active
                        </option>
@@ -66,7 +76,7 @@
 
                 <div class="form-group">
                     <label for="">Content</label>
-                     <wysiwyg v-model="myHTML" />
+                     <wysiwyg v-model="form.content"  />
                 </div>
 
                 <div class="form-group">
@@ -93,6 +103,14 @@
                 >
             Close
           </b-button>
+                 <b-button
+                variant="success"
+                size="sm"
+                class="float-right"
+                @click="saveDepartment()"
+                >
+            Save
+          </b-button>
             </template>
         </b-modal>  
 
@@ -103,21 +121,41 @@
 
 <script>
 import api from '../services/api';
+import axios from 'axios';
+//const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
 export default {
     data(){
         return {
       //  show: false,
+        rows :1,
+        currentPage:1,
+         perPage : 5,
         departmentImageFile: '', 
         imageData:'https://www.liberaldictionary.com/wp-content/uploads/2019/02/department-7600.jpg',
         myHTML:'',
-        file: null,    
+        file: null,   
+        imageUrl: '', 
+        form: {
+            name: '',
+            status: '',
+            content: '',
+            imageUrl: ''
+
+        },
         fields: [
-          'index',
+          'id',
           'name',
           'content',
           {key: 'createdAt', label: 'Created On'}
         ],
           items: [],
+            get itemsForList() {
+                return this.data.slice(
+                (this.currentPage - 1) * this.perPage,
+                this.currentPage * this.perPage,
+                );
+            }
      
         }
     }, methods: {
@@ -144,18 +182,37 @@ export default {
     fetchData(){
         api.get('/department').then((response)=>{
             this.items = response.data.data;
+            this.rows = this.items.length;
             //console.log(response.data)
         }).catch(error=> console.error(error))
         .finally(()=>{
             console.log("Hello here")
         })
     },
-    uploadImage(){
-        api.post('/upload/cloud',this.departmentImage).then(data=>{
-            console.log(data)
+    async uploadImage(){
+        axios.post('http://localhost:3000/api/upload/cloud', this.departmentImageFile).then(data=>{
+         this.form.imageUrl = data.data.data.url
+         this.persitData();
+           return this.form
         }).catch(error=>{
             console.log(error);
         })
+    },
+    saveDepartment(){
+        if(this.departmentImageFile){
+            this.uploadImage()
+        }else{
+            this.persitData();
+        }
+     
+    },
+    persitData(){
+    console.log("persit data ", this.form)
+     api.post('/department', this.form).then(()=>{
+                this.fetchData();
+            }).catch((error)=>{
+                console.log(error)
+            })
     }
 
     },
