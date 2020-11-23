@@ -13,7 +13,7 @@
 
     <div class="card mt-3">
         <div class="card-header">
-            List Department
+            List Departments
             <b-button class=" float-right" variant="primary" v-b-modal.add-department> <i class="fas fa-plus"></i> Add Department</b-button>
         </div>
         <div class="card-body">
@@ -28,6 +28,12 @@
 
                           <template #cell(createdAt)="data">
                               <timeago :datetime="data.item.createdAt"></timeago>
+                                <!-- {{ data.index + 1 }} -->
+                            </template>
+
+                          <template #cell(actions)="data">
+                                  <a href="#" class="mr-2 text-info" v-on:click="editItem(data.item.id)"><b-icon icon="pencil-square" ></b-icon></a>
+                                  <a href="#" class="text-danger"  v-on:click="editItem(data.item.id)"><b-icon icon="trash" ></b-icon></a>
                                 <!-- {{ data.index + 1 }} -->
                             </template>
                     </b-table>
@@ -147,7 +153,8 @@ export default {
           'id',
           'name',
           'content',
-          {key: 'createdAt', label: 'Created On'}
+          {key: 'createdAt', label: 'Created On'},
+          'actions',
         ],
           items: [],
             get itemsForList() {
@@ -168,6 +175,9 @@ export default {
             };
             reader.readAsDataURL(input.files[0]);
         }
+    },
+    editItem(id){
+        console.log(id);
     },
     upload(event) {
       //call preview
