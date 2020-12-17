@@ -2,7 +2,7 @@
   <div style="margin-top: 20px">
     <div class="row">
       <div class="col-9">
-        <h4>Department</h4>
+        <h4>Event</h4>
       </div>
 
       <div class="col-3"></div>
@@ -10,13 +10,9 @@
 
     <div class="card mt-3">
       <div class="card-header">
-        List Departments
-        <b-button
-          class="float-right"
-          variant="primary"
-          v-b-modal.add-department
-        >
-          <i class="fas fa-plus"></i> Add Department</b-button
+        List Events
+        <b-button class="float-right" variant="primary" v-b-modal.add-event>
+          <i class="fas fa-plus"></i> Add Event</b-button
         >
       </div>
       <div class="card-body">
@@ -42,16 +38,21 @@
               <template #cell(actions)="data">
                 <a
                   href="#"
+                  class="mr-2 text-success"
+                  v-on:click="viewItem(data.item)"
+                  ><b-icon icon="eye-fill"></b-icon
+                ></a>
+                <a
+                  href="#"
                   class="mr-2 text-info"
                   v-on:click="editItem(data.item)"
-                  v-b-modal.add-department
+                  v-b-modal.add-event
                   ><b-icon icon="pencil-square"></b-icon
                 ></a>
                 <a
                   href="#"
                   class="text-danger"
-                   v-on:click="showDeleteModal(data.item)"
-                  
+                  v-on:click="showDeleteModal(data.item)"
                   ><b-icon icon="trash"></b-icon
                 ></a>
                 <!-- {{ data.index + 1 }} -->
@@ -71,7 +72,7 @@
       </div>
     </div>
 
-    <b-modal id="add-department" title="Add Department" size="xl">
+    <b-modal id="add-event" title="Add Event" size="xl">
       <div class="row">
         <div class="col-md-6">
           <b-img thumbnail fluid :src="imageData"></b-img>
@@ -94,6 +95,27 @@
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+            </div>
+
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="">Start Date</label>
+                  <date-picker
+                    v-model="form.startDate"
+                    :config="options"
+                  ></date-picker>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="">Expiration</label>
+                  <date-picker
+                    v-model="form.endDate"
+                    :config="options"
+                  ></date-picker>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
@@ -128,19 +150,21 @@
           variant="success"
           size="sm"
           class="float-right"
-          @click="saveDepartment()"
+          @click="saveEvent()"
         >
           Save
         </b-button>
       </template>
     </b-modal>
 
-    <b-modal id="delete-department" title="Delete Department">
-   
-    <div class="d-block">
-      <p>This action is irreversible. Do you want to delete <b>{{ selectedDepartmentName}}</b> department?</p>
-    </div>
-    <template #modal-footer="{ cancel }">
+    <b-modal id="delete-event" title="Delete Event">
+      <div class="d-block">
+        <p>
+          This action is irreversible. Do you want to delete
+          <b>{{ selectedEventName }}</b> department?
+        </p>
+      </div>
+      <template #modal-footer="{ cancel }">
         <b-button
           variant="secondary"
           size="sm"
@@ -153,40 +177,74 @@
           variant="danger"
           size="sm"
           class="float-right"
-          @click="deleteDepartment(selectedDepartmentId)"
+          @click="deleteEvent(selectedEventId)"
         >
           Delete
         </b-button>
       </template>
-  </b-modal>
+    </b-modal>
+
+    <!-- 
+      view event modal
+  -->
+
+    <b-modal id="view-event" title="View Event" size="lg" hide-footer>
+      <div class="row" v-if="selectedEvent != null">
+        <div class="col-8">
+          <b-img thumbnail fluid :src="selectedEvent.imageUrl"></b-img>
+        </div>
+        <div class="col-4">
+          <p>Name: {{ selectedEvent.name }}</p>
+          <p>Details: {{ selectedEvent.content }}</p>
+
+          <p>
+            Status:
+            <span
+              class="badge"
+              v-bind:class="{
+                'bg-success': selectedEvent.status == 'active',
+                'bg-danger': selectedEvent.status == 'inactive',
+              }"
+              >{{ selectedEvent.status }}</span
+            >
+          </p>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
-<script>
+ <script>
 import api from "../services/api";
 import axios from "axios";
-//const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
 export default {
   data() {
     return {
-      //  show: false,
       rows: 1,
       currentPage: 1,
       perPage: 5,
-      departmentImageFile: "",
+      eventImageFile: "",
       imageData:
         "https://www.liberaldictionary.com/wp-content/uploads/2019/02/department-7600.jpg",
       myHTML: "",
       file: null,
-      selectedDepartmentId: "",
-      selectedDepartmentName: "",
+      selectedEvent: null,
+      selectedEventId: "",
+      selectedEventName: "",
       imageUrl: "",
       form: {
         name: "",
         status: "",
         content: "",
+        startDate: Date.now(),
+        endDate: Date.now(),
         imageUrl: "",
+      },
+      date: new Date(),
+      options: {
+        format: "DD/MM/YYYY h:mm:ss",
+        useCurrent: false,
       },
       fields: [
         "id",
@@ -205,10 +263,10 @@ export default {
     };
   },
   methods: {
-    showDeleteModal(data){
-      this.selectedDepartmentId = data.id;
-      this.selectedDepartmentName = data.name
-      this.$bvModal.show('delete-department')
+    showDeleteModal(data) {
+      this.selectedEventId = data.id;
+      this.selectedEventName = data.name;
+      this.$bvModal.show("delete-event");
     },
     previewImage: function (event) {
       var input = event.target;
@@ -219,6 +277,10 @@ export default {
         };
         reader.readAsDataURL(input.files[0]);
       }
+    },
+    viewItem(data) {
+      this.selectedEvent = data;
+      this.$bvModal.show("view-event");
     },
     editItem(data) {
       this.form = {
@@ -233,17 +295,17 @@ export default {
     upload(event) {
       //call preview
       this.previewImage(event);
-      this.departmentImageFile = new FormData();
+      this.eventImageFile = new FormData();
       this.file = event.target.files[0];
-      this.departmentImageFile.append("name", "my-file");
-      this.departmentImageFile.append("document", this.file);
-      console.log(this.departmentImageFile);
+      this.eventImageFile.append("name", "my-file");
+      this.eventImageFile.append("document", this.file);
+      console.log(this.eventImageFile);
     },
 
     //fetch Departments
     fetchData() {
       api
-        .get("/department")
+        .get("/event")
         .then((response) => {
           this.items = response.data.data;
           this.rows = this.items.length;
@@ -254,21 +316,20 @@ export default {
           console.log("Hello here");
         });
     },
-    deleteDepartment(id){
-      api.delete(`/department/${id}`).then(response=>{
-        console.log(response);
-        this.$bvModal.hide('delete-department')
-         this.$toastr.s("Department deleted   👍");
-        this.fetchData();
-      }).catch(error=> console.log(error));
-
+    deleteEvent(id) {
+      api
+        .delete(`/event/${id}`)
+        .then((response) => {
+          console.log(response);
+          this.$bvModal.hide("delete-event");
+          this.$toastr.s("Event deleted   👍");
+          this.fetchData();
+        })
+        .catch((error) => console.log(error));
     },
     async uploadImage() {
       axios
-        .post(
-          "http://localhost:3000/api/upload/cloud",
-          this.departmentImageFile
-        )
+        .post("http://localhost:3000/api/upload/cloud", this.eventImageFile)
         .then((data) => {
           this.form.imageUrl = data.data.data.url;
           this.persitData();
@@ -278,8 +339,8 @@ export default {
           console.log(error);
         });
     },
-    saveDepartment() {
-      if (this.departmentImageFile) {
+    saveEvent() {
+      if (this.eventImageFile) {
         this.uploadImage();
       } else {
         this.persitData();
@@ -289,10 +350,10 @@ export default {
       console.log("persit data ", this.form);
       if (this.form.id) {
         api
-          .patch("/department", this.form)
+          .patch("/event", this.form)
           .then(() => {
-            this.$toastr.s("Department updated successfully   👍");
-            this.$bvModal.hide('add-department')
+            this.$toastr.s("Event updated successfully   👍");
+            this.$bvModal.hide("add-event");
             this.fetchData();
           })
           .catch((error) => {
@@ -300,11 +361,11 @@ export default {
           });
       } else {
         api
-          .post("/department", this.form)
+          .post("/event", this.form)
           .then(() => {
+            this.$toastr.s("Event added successfully   👍");
+            this.$bvModal.hide("add-event");
             this.fetchData();
-              this.$toastr.s("Department added successfully   👍");
-            this.$bvModal.hide('add-department')
           })
           .catch((error) => {
             console.log(error);
@@ -317,6 +378,3 @@ export default {
   },
 };
 </script>
-
-<style >
-</style>

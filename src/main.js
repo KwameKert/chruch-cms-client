@@ -11,10 +11,14 @@ import wysiwyg from "vue-wysiwyg";
 import VueToastr from "vue-toastr";
 import api from './services/api';
 import VueTimeago from 'vue-timeago'
-
+import datePicker from 'vue-bootstrap-datetimepicker';
 import "vue-wysiwyg/dist/vueWysiwyg.css";
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
+
+
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+Vue.use(datePicker);
 // Install BootstrapVue
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
