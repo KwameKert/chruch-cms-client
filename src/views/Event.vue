@@ -190,12 +190,14 @@
 
     <b-modal id="view-event" title="View Event" size="lg" hide-footer>
       <div class="row" v-if="selectedEvent != null">
-        <div class="col-8">
+        <div class="col-7">
           <b-img thumbnail fluid :src="selectedEvent.imageUrl"></b-img>
         </div>
-        <div class="col-4">
-          <p>Name: {{ selectedEvent.name }}</p>
-          <p>Details: {{ selectedEvent.content }}</p>
+        <div class="col-5">
+          <p><b>Name: </b>{{ selectedEvent.name }}</p>
+          <p><b>Details: </b>{{ selectedEvent.content }}</p>
+          <p><b>Start Date: </b> {{ (new Date(selectedEvent.startDate)).toLocaleString()}} </p>
+          <p><b>End Date: </b>{{(new Date(selectedEvent.endDate)).toLocaleString()}} </p>
 
           <p>
             Status:
@@ -288,6 +290,8 @@ export default {
         name: data.name,
         status: data.status,
         content: data.content,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate)
       };
       this.imageData = data.imageUrl;
       console.log(data);

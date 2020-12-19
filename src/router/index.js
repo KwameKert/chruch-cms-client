@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Auth  from '../layouts/Auth';
 import Dashboard from '../views/Dashboard';
 import Department from '../views/Department';
+import Sermon from '../views/Sermon';
 import Event from '../views/Event';
 import Default from '../layouts/Default';
 import Login from '../views/Login';
@@ -44,6 +45,7 @@ const routes = [
     children: [
       {path: '/dashboard', component:Dashboard},
       {path: '/department', component:Department},
+      {path: '/sermon', component:Sermon},
       {path: '/event', component:Event}
     ],
     beforeEnter : guardMyroute

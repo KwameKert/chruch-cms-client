@@ -22,7 +22,7 @@
           <i class="mdi mdi-calendar"></i>  Events
         </router-link>
 
-         <router-link  class="list-group-item list-group-item-action bg-light" to="/event">
+         <router-link  class="list-group-item list-group-item-action bg-light" to="/sermon">
           <i class="fas fa-bible"></i>  Sermons
         </router-link>
 
