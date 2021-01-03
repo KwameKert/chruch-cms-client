@@ -22,17 +22,22 @@
           <i class="mdi mdi-calendar"></i>  Events
         </router-link>
 
+         <router-link  class="list-group-item list-group-item-action bg-light" to="/verse">
+          <i class="fas fa-bible"></i>  Verses
+        </router-link>
          <router-link  class="list-group-item list-group-item-action bg-light" to="/sermon">
-          <i class="fas fa-bible"></i>  Sermons
+          <b-icon icon="collection-play-fill"></b-icon>
+  Sermons
+  
         </router-link>
 
-        <router-link  class="list-group-item list-group-item-action bg-light" to="/department">
+        <!-- <router-link  class="list-group-item list-group-item-action bg-light" to="/department">
           <i class="mdi mdi-office-building"></i>  Departments
         </router-link>
 
         <router-link  class="list-group-item list-group-item-action bg-light" to="/event">
           <i class="mdi mdi-contacts"></i>  Leaders
-        </router-link>
+        </router-link> -->
        
 
       </div>

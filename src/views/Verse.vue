@@ -2,7 +2,7 @@
   <div style="margin-top: 20px">
     <div class="row">
       <div class="col-9">
-        <h4>Sermon</h4>
+        <h4>Verse</h4>
       </div>
 
       <div class="col-3"></div>
@@ -10,9 +10,9 @@
 
     <div class="card mt-3">
       <div class="card-header">
-        List Sermons
-        <b-button class="float-right" variant="primary" v-b-modal.add-sermon>
-          <i class="fas fa-plus"></i> Add Sermon</b-button
+        List Verses
+        <b-button class="float-right" variant="primary" v-b-modal.add-verse>
+          <i class="fas fa-plus"></i> Add Verse</b-button
         >
       </div>
       <div class="card-body">
@@ -45,11 +45,11 @@
                   v-on:click="viewItem(data.item)"
                   ><b-icon icon="eye-fill"></b-icon
                 ></a>
-                <a
+                 <a
                   href="#"
                   class="mr-2 text-info"
                   v-on:click="editItem(data.item)"
-                  v-b-modal.add-sermon
+                  v-b-modal.add-verse
                   ><b-icon icon="pencil-square"></b-icon
                 ></a>
                 <!-- {{ data.index + 1 }} -->
@@ -69,7 +69,7 @@
       </div>
     </div>
 
-    <b-modal id="add-sermon" title="Add Sermon" size="lg">
+    <b-modal id="add-verse" title="Add verse">
       <div class="row">
         <div class="col-md-12">
           <form @submit.prevent>
@@ -90,14 +90,9 @@
                 <option value="inactive">Inactive</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label for="">Url </label>
-              <input type="text" class="form-control" v-model="form.url" />
-            </div>
-            <div class="form-group">
-              <label for="">Description</label>
-              <wysiwyg v-model="form.description" />
+              <label for="">Content</label>
+              <wysiwyg v-model="form.content" />
             </div>
           </form>
         </div>
@@ -123,30 +118,21 @@
       </template>
     </b-modal>
 
-    <b-modal id="view-sermon" title="View Sermon" size="lg" hide-footer>
-      <div class="row" v-if="selectedSermon != null">
-        <div class="col-7">
-          <iframe
-            width="450"
-            height="315"
-            :src="selectedSermon.url"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <div class="col-5">
-          <p><b>Title: </b>{{ selectedSermon.title }}</p>
-          <p><b>Description: </b>{{ selectedSermon.description }}</p>
+    <b-modal id="view-verse" title="View Verse"  hide-footer>
+      <div class="row" v-if="selectedVerse != null">
+        
+        <div class="col-12">
+          <p><b>Title: </b>{{ selectedVerse.title }}</p>
+          <p><b>Content: </b>{{ selectedVerse.content }}</p>
           <p>
-            Status:
+            <b>Status: </b>
             <span
               class="badge"
               v-bind:class="{
-                'bg-success': selectedSermon.status == 'active',
-                'bg-danger': selectedSermon.status == 'inactive',
+                'bg-success': selectedVerse.status == 'active',
+                'bg-danger': selectedVerse.status == 'inactive',
               }"
-              >{{ selectedSermon.status }}</span
+              >{{ selectedVerse.status }}</span
             >
           </p>
         </div>
@@ -164,18 +150,16 @@ export default {
       rows: 1,
       currentPage: 1,
       perPage: 5,
-      selectedSermon: null,
+      selectedVerse: null,
       form: {
         title: "",
-        description: "",
-        status: "",
-        url: "",
+        content: "",
+        status: ""
       },
       fields: [
         "id",
         "title",
-        "url",
-        "description",
+        "content",
         { key: "createdAt", label: "Created On" },
         "actions",
       ],
@@ -191,7 +175,7 @@ export default {
   methods: {
     fetchData() {
       api
-        .get("/sermon")
+        .get("/verse")
         .then((response) => {
           if (response.data.data) {
             this.items = response.data.data;
@@ -206,24 +190,24 @@ export default {
       this.form = {
         id: data.id,
         title: data.title,
-        description: data.description,
-        status: data.status,
-        url: data.url,
+        content: data.content,
+        status: data.status
       };
       console.log(data);
     },
     viewItem(data) {
-      this.selectedSermon = data;
-      this.$bvModal.show("view-sermon");
+      this.selectedVerse = data;
+      this.$bvModal.show("view-verse");
     },
     persitData() {
       console.log("persit data ", this.form);
       if (this.form.id) {
         api
-          .patch("/sermon", this.form)
+          .patch("/verse", this.form)
           .then(() => {
-            this.$toastr.s("Sermon updated successfully   👍");
-            this.$bvModal.hide("add-sermon");
+              console.log(this.form)
+            this.$toastr.s("Verse updated successfully   👍");
+            this.$bvModal.hide("add-verse");
             this.fetchData();
           })
           .catch((error) => {
@@ -231,11 +215,11 @@ export default {
           });
       } else {
         api
-          .post("/sermon", this.form)
+          .post("/verse", this.form)
           .then(() => {
             this.fetchData();
-            this.$toastr.s("Sermon added successfully   👍");
-            this.$bvModal.hide("add-sermon");
+            this.$toastr.s("Verse added successfully   👍");
+            this.$bvModal.hide("add-verse");
           })
           .catch((error) => {
             console.log(error);

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Auth  from '../layouts/Auth';
 import Dashboard from '../views/Dashboard';
-import Department from '../views/Department';
+import Verse from '../views/Verse';
 import Sermon from '../views/Sermon';
 import Event from '../views/Event';
 import Default from '../layouts/Default';
@@ -44,7 +44,7 @@ const routes = [
     component: Default,
     children: [
       {path: '/dashboard', component:Dashboard},
-      {path: '/department', component:Department},
+      {path: '/verse', component:Verse},
       {path: '/sermon', component:Sermon},
       {path: '/event', component:Event}
     ],

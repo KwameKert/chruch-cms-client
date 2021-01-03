@@ -11,7 +11,7 @@
     <div class="card mt-3">
       <div class="card-header">
         List Events
-        <b-button class="float-right" variant="primary" v-b-modal.add-event>
+        <b-button class="float-right" variant="primary" v-b-modal.add-event v-on:click="addItem()" >
           <i class="fas fa-plus"></i> Add Event</b-button
         >
       </div>
@@ -245,7 +245,7 @@ export default {
       },
       date: new Date(),
       options: {
-        format: "DD/MM/YYYY h:mm:ss",
+       // format: "DD/MM/YYYY h:mm:ss",
         useCurrent: false,
       },
       fields: [
@@ -283,6 +283,10 @@ export default {
     viewItem(data) {
       this.selectedEvent = data;
       this.$bvModal.show("view-event");
+    },
+    addItem(){
+      this.imageData = "https://www.liberaldictionary.com/wp-content/uploads/2019/02/department-7600.jpg",
+      this.form = {};
     },
     editItem(data) {
       this.form = {
@@ -351,7 +355,10 @@ export default {
       }
     },
     persitData() {
-      console.log("persit data ", this.form);
+      console.log(this.form.startDate, this.form.endDate)
+
+      // this.form.startDate = new Date(this.form.startDate);
+      // this.form.endDate = new Date(this.form.endDate);
       if (this.form.id) {
         api
           .patch("/event", this.form)
