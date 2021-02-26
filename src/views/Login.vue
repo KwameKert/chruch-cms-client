@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from "../services/api";
 export default {
   name: "Login",
   data() {
@@ -78,7 +78,7 @@ export default {
       this.isLoading = true;
       let loginForm = JSON.parse(JSON.stringify(form));
       try{
-   axios.post("http://localhost:3000/api/auth/login", loginForm).then(
+   api.post("/auth/login", loginForm).then(
         (response) => {
           if(response.status == 200){
             this.$toastr.s("User Authenticated  😃");

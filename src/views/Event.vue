@@ -26,12 +26,23 @@
               :per-page="perPage"
               :current-page="currentPage"
             >
-              <template #cell(content)="data">
-                {{ data.item.content.slice(0, 100) }}...
+               <template #cell(status)="data">
+               <span
+              class="badge"
+              v-bind:class="{
+                'bg-success': data.item.status == 'active',
+                'bg-danger': data.item.status == 'inactive',
+              }"
+              >{{ data.item.status }}
+              </span>
               </template>
 
               <template #cell(createdAt)="data">
                 <timeago :datetime="data.item.createdAt"></timeago>
+                <!-- {{ data.index + 1 }} -->
+              </template>
+              <template #cell(startDate)="data">
+                <timeago :datetime="data.item.startDate"></timeago>
                 <!-- {{ data.index + 1 }} -->
               </template>
 
@@ -76,6 +87,8 @@
       <div class="row">
         <div class="col-md-6">
           <b-img thumbnail fluid :src="imageData"></b-img>
+          <div v-if="isLoding"><b-spinner variant="primary" label="Spinning"></b-spinner> Loading...</div>
+
         </div>
         <div class="col-md-6">
           <form @submit.prevent="submitForm()">
@@ -192,13 +205,13 @@
       <div class="row" v-if="selectedEvent != null">
         <div class="col-7">
           <b-img thumbnail fluid :src="selectedEvent.imageUrl"></b-img>
+            
         </div>
         <div class="col-5">
           <p><b>Name: </b>{{ selectedEvent.name }}</p>
-          <p><b>Details: </b>{{ selectedEvent.content }}</p>
           <p><b>Start Date: </b> {{ (new Date(selectedEvent.startDate)).toLocaleString()}} </p>
           <p><b>End Date: </b>{{(new Date(selectedEvent.endDate)).toLocaleString()}} </p>
-
+          
           <p>
             Status:
             <span
@@ -210,6 +223,8 @@
               >{{ selectedEvent.status }}</span
             >
           </p>
+          <p><b>Details: </b><span v-html="selectedEvent.content"></span></p>
+
         </div>
       </div>
     </b-modal>
@@ -218,12 +233,12 @@
 
  <script>
 import api from "../services/api";
-import axios from "axios";
 
 export default {
   data() {
     return {
       rows: 1,
+      isLoding: false,
       currentPage: 1,
       perPage: 5,
       eventImageFile: "",
@@ -251,7 +266,8 @@ export default {
       fields: [
         "id",
         "name",
-        "content",
+        "status",
+        { key: "startDate", label: "Start Date" },
         { key: "createdAt", label: "Created On" },
         "actions",
       ],
@@ -336,8 +352,8 @@ export default {
         .catch((error) => console.log(error));
     },
     async uploadImage() {
-      axios
-        .post("http://localhost:3000/api/upload/cloud", this.eventImageFile)
+      api
+        .post("/upload/cloud", this.eventImageFile)
         .then((data) => {
           this.form.imageUrl = data.data.data.url;
           this.persitData();
@@ -348,6 +364,7 @@ export default {
         });
     },
     saveEvent() {
+       this.isLoding = true
       if (this.eventImageFile) {
         this.uploadImage();
       } else {
@@ -356,9 +373,7 @@ export default {
     },
     persitData() {
       console.log(this.form.startDate, this.form.endDate)
-
-      // this.form.startDate = new Date(this.form.startDate);
-      // this.form.endDate = new Date(this.form.endDate);
+     
       if (this.form.id) {
         api
           .patch("/event", this.form)
@@ -369,6 +384,8 @@ export default {
           })
           .catch((error) => {
             console.log(error);
+          }).finally(()=>{
+            this.isLoding = false
           });
       } else {
         api
@@ -380,6 +397,9 @@ export default {
           })
           .catch((error) => {
             console.log(error);
+            
+          }).finally(()=>{
+            this.isLoding = false
           });
       }
     },

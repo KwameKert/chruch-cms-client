@@ -26,12 +26,17 @@
               :per-page="perPage"
               :current-page="currentPage"
             >
-              <template #cell(description)="data">
-                {{ data.item.description.slice(0, 100) }}...
+              <template #cell(status)="data">
+               <span
+              class="badge"
+              v-bind:class="{
+                'bg-success': data.item.status == 'active',
+                'bg-danger': data.item.status == 'inactive',
+              }"
+              >{{ data.item.status }}
+              </span>
               </template>
-              <template #cell(url)="data">
-                {{ data.item.url.slice(0, 10) }}...
-              </template>
+             
 
               <template #cell(createdAt)="data">
                 <timeago :datetime="data.item.createdAt"></timeago>
@@ -119,22 +124,23 @@
     </b-modal>
 
     <b-modal id="view-verse" title="View Verse"  hide-footer>
+    
       <div class="row" v-if="selectedVerse != null">
         
         <div class="col-12">
           <p><b>Title: </b>{{ selectedVerse.title }}</p>
-          <p><b>Content: </b>{{ selectedVerse.content }}</p>
-          <p>
-            <b>Status: </b>
-            <span
+          <p><b>Status: </b>
+          <span
               class="badge"
               v-bind:class="{
                 'bg-success': selectedVerse.status == 'active',
                 'bg-danger': selectedVerse.status == 'inactive',
               }"
-              >{{ selectedVerse.status }}</span
-            >
-          </p>
+              >{{ selectedVerse.status }}
+              </span>
+              </p>
+          <p><b>Content: </b> <span v-html="selectedVerse.content"></span></p>
+       
         </div>
       </div>
     </b-modal>
@@ -159,7 +165,7 @@ export default {
       fields: [
         "id",
         "title",
-        "content",
+        "status",
         { key: "createdAt", label: "Created On" },
         "actions",
       ],
